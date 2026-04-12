@@ -6,23 +6,47 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 function TimeTrackPage() {
   const globalCtx = useContext(GlobalContext);
 
-  const [latest, setLatest] = useState(null);
-  const [readings, setReadings] = useState([]);
-  const [variables, setVariables] = useState([]);
+  const [devices,          setDevices]          = useState([]);
+  const [selectedDevice,   setSelectedDevice]   = useState('');
+  const [latest,           setLatest]           = useState(null);
+  const [readings,         setReadings]         = useState([]);
+  const [variables,        setVariables]        = useState([]);
   const [selectedVariable, setSelectedVariable] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [error,            setError]            = useState('');
+  const [loading,          setLoading]          = useState(false);
 
   useEffect(() => {
     if (!globalCtx.token) return;
-    fetchLatest();
-    fetchVariables();
-    fetchReadings();
+    fetchDevices();
   }, [globalCtx.token]);
 
-  async function fetchLatest() {
+  useEffect(() => {
+    if (!selectedDevice) return;
+    setSelectedVariable('');
+    setLatest(null);
+    setReadings([]);
+    fetchLatest(selectedDevice);
+    fetchVariables(selectedDevice);
+    fetchReadings(selectedDevice, '');
+  }, [selectedDevice]);
+
+  async function fetchDevices() {
     try {
-      const res = await fetch(`${API_URL}/readings/latest`, {
+      const res = await fetch(`${API_URL}/devices`, {
+        headers: globalCtx.getAuthHeaders(),
+      });
+      if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+      const data = await res.json();
+      setDevices(data);
+      if (data.length > 0) setSelectedDevice(data[0].label);
+    } catch (e) {
+      setError(`Devices: ${e.message}`);
+    }
+  }
+
+  async function fetchLatest(device) {
+    try {
+      const res = await fetch(`${API_URL}/readings/latest?device=${device}`, {
         headers: globalCtx.getAuthHeaders(),
       });
       if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
@@ -32,9 +56,9 @@ function TimeTrackPage() {
     }
   }
 
-  async function fetchVariables() {
+  async function fetchVariables(device) {
     try {
-      const res = await fetch(`${API_URL}/readings/variables`, {
+      const res = await fetch(`${API_URL}/readings/variables?device=${device}`, {
         headers: globalCtx.getAuthHeaders(),
       });
       if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
@@ -44,18 +68,16 @@ function TimeTrackPage() {
     }
   }
 
-  async function fetchReadings(variable) {
+  async function fetchReadings(device, variable) {
     setLoading(true);
     try {
       const url = variable
-        ? `${API_URL}/readings?variable=${variable}&limit=50`
-        : `${API_URL}/readings?limit=50`;
-      const res = await fetch(url, {
-        headers: globalCtx.getAuthHeaders(),
-      });
+        ? `${API_URL}/readings?device=${device}&variable=${variable}&limit=50`
+        : `${API_URL}/readings?device=${device}&limit=50`;
+      const res = await fetch(url, { headers: globalCtx.getAuthHeaders() });
       if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
       const data = await res.json();
-      setReadings([...data].reverse()); // newest first
+      setReadings([...data].reverse());
     } catch (e) {
       setError(`Readings: ${e.message}`);
     } finally {
@@ -63,23 +85,36 @@ function TimeTrackPage() {
     }
   }
 
+  function handleDeviceChange(e) {
+    setSelectedDevice(e.target.value);
+  }
+
   function handleVariableChange(e) {
     const val = e.target.value;
     setSelectedVariable(val);
-    fetchReadings(val);
+    fetchReadings(selectedDevice, val);
   }
 
   return (
     <div style={{ padding: '2rem', fontFamily: 'monospace' }}>
       <h1>Sensor Readings</h1>
 
-      {error && (
-        <p style={{ color: 'red' }}>{error}</p>
-      )}
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+
+      {/* Device selector */}
+      <div style={{ marginBottom: '1.5rem' }}>
+        <label style={{ marginRight: '0.5rem' }}>Device:</label>
+        <select value={selectedDevice} onChange={handleDeviceChange}>
+          {devices.length === 0 && <option value="">No devices registered</option>}
+          {devices.map(d => (
+            <option key={d.label} value={d.label}>{d.name} ({d.label})</option>
+          ))}
+        </select>
+      </div>
 
       {/* Latest readings */}
       <h2>Latest</h2>
-      {latest ? (
+      {latest && Object.keys(latest).length > 0 ? (
         <table style={{ borderCollapse: 'collapse', marginBottom: '2rem' }}>
           <thead>
             <tr>
@@ -111,7 +146,10 @@ function TimeTrackPage() {
             <option key={v} value={v}>{v}</option>
           ))}
         </select>
-        <button onClick={() => fetchReadings(selectedVariable)} style={{ marginLeft: '0.5rem' }}>
+        <button
+          onClick={() => fetchReadings(selectedDevice, selectedVariable)}
+          style={{ marginLeft: '0.5rem' }}
+        >
           Refresh
         </button>
       </div>

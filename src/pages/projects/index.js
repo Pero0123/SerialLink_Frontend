@@ -1,172 +1,237 @@
-import { useState, useEffect } from 'react';
-import classes from '../../styles/projects.module.css';
+import { useState, useEffect, useContext } from 'react';
+import GlobalContext from '../store/globalContext';
 
-import { useContext } from 'react';
-import GlobalContext from "../../pages/store/globalContext"
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 function ProjectsPage() {
-  const globalCtx = useContext(GlobalContext)
-  const username = globalCtx.email;
-  const [projects, setProjects] = useState([]);
-  const [userID, setUserID] = useState(null);
-  const [projectName, setProjectName] = useState('');
-  const [projectDescription, setProjectDescription] = useState('');
+  const globalCtx = useContext(GlobalContext);
+
+  const [devices,      setDevices]      = useState([]);
+  const [newLabel,     setNewLabel]     = useState('');
+  const [newName,      setNewName]      = useState('');
+  const [newToken,     setNewToken]     = useState('');
+  const [regError,     setRegError]     = useState('');
+  const [regSuccess,   setRegSuccess]   = useState('');
+  const [editingLabel, setEditingLabel] = useState(null);
+  const [editName,     setEditName]     = useState('');
+  const [editToken,    setEditToken]    = useState('');
+  const [editError,    setEditError]    = useState('');
 
   useEffect(() => {
-    if (!username) return;
+    if (!globalCtx.token) return;
+    fetchDevices();
+  }, [globalCtx.token]);
 
-    const fetchUserID = async () => {
-      try {
-        // NOTE: likely /users/ not /user/
-        const res = await fetch(
-          `http://a65d0917c228c441b8b876093dfffd7e-579877813.eu-west-1.elb.amazonaws.com:8000/users/${username}`
-        );
-
-        const text = await res.text();
-        const data = JSON.parse(text);
-
-        if (!res.ok) throw new Error(data.detail || text);
-
-        setUserID(data.id);
-      } catch (e) {
-        console.error("Error fetching user id:", e);
-        setUserID(null);
-      }
-    };
-
-    fetchUserID();
-  }, [username]);
-
-  useEffect(() => {
-    if (!userID) return;
-
-    const fetchProjects = async () => {
-      try {
-        const res = await fetch(
-          `http://a2090d8f11ab942f0897c2471569b105-1957319447.eu-west-1.elb.amazonaws.com:8002/projects/${userID}`
-        );
-
-        const text = await res.text();
-        const data = JSON.parse(text);
-
-        if (!res.ok) throw new Error(data.detail || text);
-
-        setProjects(Array.isArray(data) ? data : []);
-      } catch (e) {
-        console.error("Error fetching projects:", e);
-        setProjects([]);
-      }
-    };
-
-    fetchProjects();
-  }, [userID]);
-
-
-
-  const createProject = async () => {
-    if (!projectName || !projectDescription) {
-      alert('Fill in both project name and description');
-      return;
-    }
-
+  async function fetchDevices() {
     try {
-      const response = await fetch('http://a2090d8f11ab942f0897c2471569b105-1957319447.eu-west-1.elb.amazonaws.com:8002/projects/', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: projectName,
-          description: projectDescription,
-          owner_id: userID
-        })
+      const res = await fetch(`${API_URL}/devices`, {
+        headers: globalCtx.getAuthHeaders(),
       });
-      
-      if (response.ok) {
-        setProjectName('');
-        setProjectDescription('');
-        fetchProjects();
-        alert('Project created successfully!');
-      } else {
-        const result = await response.json();
-        alert('Error creating project: ' + result.detail);
-      }
-    } catch (error) {
-      console.error('Error creating project:', error);
-      alert('Network error creating project');
+      if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+      setDevices(await res.json());
+    } catch (e) {
+      console.error('fetchDevices:', e.message);
     }
-  };
+  }
 
-  const deleteProject = async (projectId) => {
-    if (!confirm('Delete project and all its entries?')) return;
-
+  async function registerDevice(e) {
+    e.preventDefault();
+    setRegError('');
+    setRegSuccess('');
     try {
-      const response = await fetch(`http://a2090d8f11ab942f0897c2471569b105-1957319447.eu-west-1.elb.amazonaws.com:8002/project/${projectId}`, {
-        method: 'DELETE'
+      const res = await fetch(`${API_URL}/devices`, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json', ...globalCtx.getAuthHeaders() },
+        body:    JSON.stringify({ label: newLabel, name: newName, ubidotsToken: newToken }),
       });
-      if (response.ok) {
-        fetchProjects();
-      }
-    } catch (error) {
-      console.error('Error deleting project:', error);
+      const data = await res.json();
+      if (!res.ok) { setRegError(data.message || 'Registration failed'); return; }
+      setRegSuccess(`Device "${data.name}" registered`);
+      setNewLabel('');
+      setNewName('');
+      setNewToken('');
+      fetchDevices();
+    } catch {
+      setRegError('Network error');
     }
-  };
+  }
 
-  const deleteAllUserProjects = async () => {
-    if (!confirm('Delete ALL your projects and entries?')) return;
+  function startEdit(device) {
+    setEditingLabel(device.label);
+    setEditName(device.name);
+    setEditToken('');
+    setEditError('');
+  }
 
+  function cancelEdit() {
+    setEditingLabel(null);
+    setEditError('');
+  }
+
+  async function saveEdit(label) {
+    setEditError('');
     try {
-      const response = await fetch(`http://a2090d8f11ab942f0897c2471569b105-1957319447.eu-west-1.elb.amazonaws.com:8002/user/projects/${userID}`, {
-        method: 'DELETE'
+      const body = {};
+      if (editName)  body.name         = editName;
+      if (editToken) body.ubidotsToken  = editToken;
+
+      const res = await fetch(`${API_URL}/devices/${label}`, {
+        method:  'PUT',
+        headers: { 'Content-Type': 'application/json', ...globalCtx.getAuthHeaders() },
+        body:    JSON.stringify(body),
       });
-      if (response.ok) {
-        fetchProjects();
-      }
-    } catch (error) {
-      console.error('Error deleting all projects:', error);
+      const data = await res.json();
+      if (!res.ok) { setEditError(data.message || 'Update failed'); return; }
+      setEditingLabel(null);
+      fetchDevices();
+    } catch {
+      setEditError('Network error');
     }
-  };
+  }
+
+  async function deleteDevice(label) {
+    if (!confirm(`Delete device "${label}" and all its readings?`)) return;
+    try {
+      const res = await fetch(`${API_URL}/devices/${label}`, {
+        method:  'DELETE',
+        headers: globalCtx.getAuthHeaders(),
+      });
+      if (!res.ok) { const d = await res.json(); alert(d.message); return; }
+      fetchDevices();
+    } catch {
+      alert('Network error');
+    }
+  }
 
   return (
-    <div className={classes.container}>
-      <h1>Project Management</h1>
-      
-        <h2>Create Project</h2>
-        <div className={classes.inpt}>
-          <input
-            type="text"
-            placeholder="Project name"
-            value={projectName}
-            onChange={(e) => setProjectName(e.target.value)}
-          />
-          <input
-            type="text"
-            placeholder="Project description"
-            value={projectDescription}
-            onChange={(e) => setProjectDescription(e.target.value)}
-          />
-          <button onClick={createProject} className={classes.createBtn}>
-            Create Project
-          </button>
-        </div>
+    <div style={{ padding: '2rem', fontFamily: 'monospace' }}>
+      <h1>Device Management</h1>
 
-        <h2>Your Projects</h2>
-        <div className={classes.projects}>
-          {projects.map(project => (
-            <div key={project.id} className={classes.project}>
-              <div>
-                <strong>{project.name}</strong>
-                <p>{project.description}</p>
-              </div>
-              <button onClick={() => deleteProject(project.id)} className={classes.deleteBtn}>
-                Delete
-              </button>
-            </div>
-          ))}
-        </div>
-        <button onClick={deleteAllUserProjects} className={classes.deleteBtn}>
-          Delete All My Projects
-        </button>
+      {/* Register device */}
+      <h2>Register Device</h2>
+      <form onSubmit={registerDevice} style={{ marginBottom: '2rem', display: 'flex', flexDirection: 'column', gap: '0.75rem', maxWidth: '360px' }}>
+        <label>
+          <div style={{ marginBottom: '0.25rem' }}>Ubidots device label</div>
+          <input
+            placeholder="e.g. seriallink"
+            value={newLabel}
+            onChange={e => setNewLabel(e.target.value)}
+            required
+            style={{ ...inputStyle, width: '100%' }}
+          />
+        </label>
+        <label>
+          <div style={{ marginBottom: '0.25rem' }}>Display name</div>
+          <input
+            placeholder="e.g. Unit 1 — Warehouse A"
+            value={newName}
+            onChange={e => setNewName(e.target.value)}
+            required
+            style={{ ...inputStyle, width: '100%' }}
+          />
+        </label>
+        <label>
+          <div style={{ marginBottom: '0.25rem' }}>Ubidots API token</div>
+          <input
+            type="password"
+            placeholder="BBUS-..."
+            value={newToken}
+            onChange={e => setNewToken(e.target.value)}
+            required
+            style={{ ...inputStyle, width: '100%' }}
+          />
+        </label>
+        <button type="submit" style={btnStyle}>Register</button>
+        {regError   && <p style={{ color: 'red',   margin: 0 }}>{regError}</p>}
+        {regSuccess && <p style={{ color: 'green', margin: 0 }}>{regSuccess}</p>}
+      </form>
+
+      {/* Device list */}
+      <h2>Registered Devices</h2>
+      {devices.length === 0 ? (
+        <p>No devices registered yet.</p>
+      ) : (
+        <table style={{ borderCollapse: 'collapse' }}>
+          <thead>
+            <tr>
+              <th style={th}>Label</th>
+              <th style={th}>Name</th>
+              <th style={th}>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {devices.map(d => (
+              <tr key={d.label}>
+                <td style={td}>{d.label}</td>
+                <td style={td}>
+                  {editingLabel === d.label ? (
+                    <input
+                      value={editName}
+                      onChange={e => setEditName(e.target.value)}
+                      style={{ ...inputStyle, width: '100%' }}
+                    />
+                  ) : d.name}
+                </td>
+                <td style={td}>
+                  {editingLabel === d.label ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                      <input
+                        type="password"
+                        placeholder="New Ubidots token (leave blank to keep)"
+                        value={editToken}
+                        onChange={e => setEditToken(e.target.value)}
+                        style={{ ...inputStyle, width: '260px' }}
+                      />
+                      {editError && <span style={{ color: 'red' }}>{editError}</span>}
+                      <div style={{ display: 'flex', gap: '0.4rem' }}>
+                        <button onClick={() => saveEdit(d.label)} style={btnStyle}>Save</button>
+                        <button onClick={cancelEdit} style={{ ...btnStyle, backgroundColor: '#555' }}>Cancel</button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div style={{ display: 'flex', gap: '0.4rem' }}>
+                      <button onClick={() => startEdit(d)}          style={btnStyle}>Edit</button>
+                      <button onClick={() => deleteDevice(d.label)} style={{ ...btnStyle, backgroundColor: '#c0392b' }}>Delete</button>
+                    </div>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
     </div>
   );
 }
+
+const th = {
+  border: '1px solid #555',
+  padding: '0.4rem 0.8rem',
+  textAlign: 'left',
+  backgroundColor: '#222',
+  color: '#fff',
+};
+
+const td = {
+  border: '1px solid #555',
+  padding: '0.4rem 0.8rem',
+};
+
+const inputStyle = {
+  padding: '0.5rem',
+  border: '1px solid #555',
+  borderRadius: '4px',
+  backgroundColor: '#111',
+  color: '#fff',
+};
+
+const btnStyle = {
+  padding: '0.5rem',
+  backgroundColor: 'rgb(245, 173, 66)',
+  color: '#fff',
+  border: 'none',
+  borderRadius: '4px',
+  cursor: 'pointer',
+};
 
 export default ProjectsPage;

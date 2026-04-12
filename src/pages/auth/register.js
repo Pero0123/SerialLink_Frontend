@@ -5,9 +5,10 @@ import GlobalContext from '../store/globalContext';
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 function RegisterPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email,              setEmail]              = useState('');
+  const [password,           setPassword]           = useState('');
+  const [registrationSecret, setRegistrationSecret] = useState('');
+  const [error,              setError]              = useState('');
   const router = useRouter();
   const globalCtx = useContext(GlobalContext);
 
@@ -25,7 +26,7 @@ function RegisterPage() {
       const response = await fetch(`${API_URL}/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ email, password, registrationSecret })
       });
       const data = await response.json();
 
@@ -62,6 +63,16 @@ function RegisterPage() {
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            required
+            style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
+          />
+        </div>
+        <div style={{ marginBottom: '1rem' }}>
+          <input
+            type="password"
+            placeholder="Registration secret"
+            value={registrationSecret}
+            onChange={(e) => setRegistrationSecret(e.target.value)}
             required
             style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
           />
