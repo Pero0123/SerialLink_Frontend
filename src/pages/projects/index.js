@@ -105,7 +105,7 @@ function ProjectsPage() {
 
   return (
     <div style={{ padding: '2rem', fontFamily: 'monospace' }}>
-      <h1>Device Management</h1>
+      <h1>Devices</h1>
 
       {/* Register device */}
       <h2>Register Device</h2>

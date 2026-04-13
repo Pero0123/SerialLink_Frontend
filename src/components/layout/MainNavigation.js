@@ -17,10 +17,8 @@ function MainNavigation() {
 
   const contents = [
     {title: 'Home', webAddress: '/'},
-    {title: 'Time Entries', webAddress: '/timetrack'},
-    {title: 'Projects', webAddress: '/projects'},
-    {title: 'Graphs', webAddress: '/graphs'},
-    {title: 'Notifications', webAddress: '/notif'}
+    {title: 'Readings', webAddress: '/timetrack'},
+    {title: 'Devices', webAddress: '/projects'},
   ]
   
   // Add logout option if user is logged in
@@ -36,7 +34,7 @@ function MainNavigation() {
         <div className={classes.icon} onClick={() => router.push('/')} style={{cursor: 'pointer'}}>
           <img src="/icon.png" alt="Icon" className={classes.iconImage} />
         </div>
-        TTA
+        SerialLink Dashboard
       </div>
       <nav>
         <ul>
@@ -44,16 +42,10 @@ function MainNavigation() {
             <Link href='/'>Home</Link>
           </li>
           <li>
-            <Link href='/timetrack'>Time Entries</Link>
+            <Link href='/timetrack'>Readings</Link>
           </li>
           <li>
-            <Link href='/projects'>Projects</Link>
-          </li>
-          <li>
-            <Link href='/graphs'>Graphs</Link>
-          </li>
-          <li>
-            <Link href='/notif'>Notifications</Link>
+            <Link href='/projects'>Devices</Link>
           </li>
         </ul>
       </nav>
