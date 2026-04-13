@@ -1,6 +1,6 @@
 import { useState, useContext, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import GlobalContext from '../store/globalContext';
+import GlobalContext from '../../store/globalContext';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 

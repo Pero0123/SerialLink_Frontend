@@ -1,7 +1,7 @@
 import classes from './SideBar.module.css'
 import { useRouter } from 'next/router'
 import { useContext, useState } from 'react'
-import GlobalContext from "../../pages/store/globalContext"
+import GlobalContext from "../../store/globalContext"
 
 export default function SideBar(props) {
     const globalCtx = useContext(GlobalContext)

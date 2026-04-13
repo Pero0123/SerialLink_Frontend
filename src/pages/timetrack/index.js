@@ -2,7 +2,7 @@ import { useState, useEffect, useContext } from 'react';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
 } from 'recharts';
-import GlobalContext from '../store/globalContext';
+import GlobalContext from '../../store/globalContext';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 

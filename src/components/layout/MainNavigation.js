@@ -3,7 +3,7 @@ import Link from 'next/link'
 import HamMenu from "../generic/HamMenu"
 
 import { useContext } from 'react'
-import GlobalContext from "../../pages/store/globalContext"
+import GlobalContext from "../../store/globalContext"
 import SideBar from "./SideBar"
 import { useRouter } from 'next/router'
 

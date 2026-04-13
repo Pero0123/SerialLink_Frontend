@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { useRouter } from 'next/router';
-import GlobalContext from "./store/globalContext"
+import GlobalContext from "../store/globalContext"
 
 function HomePage() {
     const globalCtx = useContext(GlobalContext)

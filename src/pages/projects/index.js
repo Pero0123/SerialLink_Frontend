@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from 'react';
-import GlobalContext from '../store/globalContext';
+import GlobalContext from '../../store/globalContext';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
