@@ -29,7 +29,7 @@ function MainNavigation() {
         </div>
         <span className={classes.title}>SerialLink Dashboard</span>
       </div>
-      <nav>
+      <nav className={classes.desktopNav}>
         <ul>
           <li><Link href="/">Devices</Link></li>
           <li><Link href="/timetrack">Readings</Link></li>
