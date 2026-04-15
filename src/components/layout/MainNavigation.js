@@ -17,6 +17,8 @@ function MainNavigation() {
 
   if (globalCtx.isLoggedIn) {
     contents.push({ title: 'Logout', webAddress: '/auth/login' });
+  } else {
+    contents.push({ title: 'Log In', webAddress: '/auth/login' });
   }
 
   return (
@@ -35,16 +37,18 @@ function MainNavigation() {
           <li><Link href="/timetrack">Readings</Link></li>
         </ul>
       </nav>
-      <div className={classes.userSection}>
-        {globalCtx.isLoggedIn ? (
+      {globalCtx.isLoggedIn ? (
+        <div className={classes.userSection}>
           <div className={classes.userInfo}>
             <button onClick={globalCtx.logout} className={classes.logoutBtn}>Logout</button>
             <span className={classes.username}>{globalCtx.email?.split('@')[0]}</span>
           </div>
-        ) : (
+        </div>
+      ) : (
+        <div className={classes.userSection}>
           <Link href="/auth/login" className={classes.loginLink}>Log In</Link>
-        )}
-      </div>
+        </div>
+      )}
     </header>
   );
 }
