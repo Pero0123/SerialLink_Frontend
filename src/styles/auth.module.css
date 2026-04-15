@@ -1,0 +1,63 @@
+.container {
+  max-width: 400px;
+  margin: 2rem auto;
+  padding: 2rem;
+}
+
+.errorMsg {
+  color: var(--btn-danger);
+  margin-bottom: 1rem;
+}
+
+.field {
+  margin-bottom: 1rem;
+}
+
+.input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid var(--border-light);
+  border-radius: 4px;
+  background-color: var(--input-bg);
+  color: var(--input-color);
+}
+
+.input:-webkit-autofill,
+.input:-webkit-autofill:hover,
+.input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px var(--input-bg) inset;
+  -webkit-text-fill-color: var(--input-color);
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+.submitBtn {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: var(--btn-primary);
+  color: var(--text-on-dark);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.submitBtn:hover {
+  background-color: var(--btn-primary-hover);
+}
+
+.secondaryBtn {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: transparent;
+  color: var(--text-on-dark);
+  border: 1px solid var(--neutral-400);
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 1rem;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.secondaryBtn:hover {
+  background-color: var(--neutral-600);
+  border-color: var(--neutral-300);
+}

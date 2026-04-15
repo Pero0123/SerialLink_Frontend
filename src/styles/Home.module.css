@@ -2,6 +2,52 @@
   padding: 0 2rem;
 }
 
+.hero {
+  text-align: center;
+  margin: 2rem 0;
+}
+
+.heroImage {
+  max-width: 100%;
+  height: auto;
+}
+
+.heroButtons {
+  margin-top: 2rem;
+}
+
+.loginBtn {
+  margin: 0 1rem;
+  padding: 0.75rem 2rem;
+  font-size: 1rem;
+  background-color: var(--btn-primary);
+  color: var(--text-on-dark);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.loginBtn:hover {
+  background-color: var(--btn-primary-hover);
+}
+
+.registerBtn {
+  margin: 0 1rem;
+  padding: 0.75rem 2rem;
+  font-size: 1rem;
+  background-color: var(--neutral-600);
+  color: var(--text-on-dark);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.registerBtn:hover {
+  background-color: var(--neutral-700);
+}
+
 .main {
   min-height: 100vh;
   padding: 4rem 0;

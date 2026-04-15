@@ -5,10 +5,10 @@
   align-items: center;
   height: 46px;
   background-color: transparent;
-  border: 2px solid #444d44;
+  border: 2px solid var(--neutral-500);
   border-radius: 10px;
   margin: 5px;
-  transition: background-color 0.4s;
+  transition: background-color 0.3s, border-color 0.3s;
 }
 
 .textDiv {
@@ -22,17 +22,17 @@
   align-items: center;
   justify-content: center;
   background: transparent;
-  color: white;
+  color: var(--text-on-dark);
   font-size: 25px;
 }
 
 .mainDiv:hover {
-  background-color: #444d44;
-  border: 2px solid #777777;
+  background-color: var(--btn-primary);
+  border: 2px solid var(--btn-primary-hover);
 }
 
 .mainText {
-  color: white;
+  color: var(--text-on-dark);
   text-align: center;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 14px;

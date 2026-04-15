@@ -1,13 +1,72 @@
 @import url('https://fonts.googleapis.com/css2?family=Lato:wght@700&family=Open+Sans:wght@400;700&display=swap');
 
+:root {
+  /* Neutrals */
+  --neutral-100: #F1F2F3;
+  --neutral-200: #C6CBD1;
+  --neutral-300: #9DA6AF;
+  --neutral-400: #7B858E;
+  --neutral-500: #5A6269;
+  --neutral-600: #393E43;
+  --neutral-700: #1B1D20;
+
+  /* Blues */
+  --blue-100: #CDDAF4;
+  --blue-200: #99B3E8;
+  --blue-300: #658BDD;
+  --blue-400: #3665D3;
+  --blue-500: #0F3AB6;
+  --blue-600: #092266;
+  --blue-700: #010928;
+
+  /* Blue-Grays */
+  --bluegray-100: #ECF1F3;
+  --bluegray-200: #BACCD5;
+  --bluegray-300: #8FA7B3;
+  --bluegray-400: #71858F;
+  --bluegray-500: #536169;
+  --bluegray-600: #333D42;
+  --bluegray-700: #171C1F;
+
+  /* Semantic tokens */
+  --bg-page:       #D9DBDD;
+  --bg-nav:        #0F3AB6;
+  --bg-sidebar:    #2A2C2D;
+  --bg-surface:    #F1F2F3;
+  --bg-surface-alt: #ECF1F3;
+  --bg-active:     #CDDAF4;
+
+  --text-on-dark:  #F1F2F3;
+  --text-primary:  #393E43;
+  --text-muted:    #7B858E;
+
+  --border-strong: #7B858E;
+  --border-light:  #C6CBD1;
+
+  --btn-primary:        #0F3AB6;
+  --btn-primary-hover:  #3665D3;
+  --btn-secondary:      #3665D3;
+  --btn-secondary-hover:#658BDD;
+  --btn-neutral:        #5A6269;
+  --btn-neutral-hover:  #393E43;
+  --btn-danger:         #c0392b;
+  --btn-danger-hover:   #e74c3c;
+  --btn-success:        #27ae60;
+  --btn-success-hover:  #2ecc71;
+
+  --input-bg:    #8FA7B3;
+  --input-color: #1B1D20;
+}
+
 * {
   box-sizing: border-box;
 }
 
 body {
   font-family: 'Open Sans', 'Lato', sans-serif;
-  background: rgb(167, 167, 167);
+  background: var(--bg-page);
   margin: 0;
+  color: var(--text-primary);
 }
 
 h1,
@@ -17,4 +76,5 @@ h4,
 h5,
 h6 {
   font-family: 'Lato', sans-serif;
+  color: var(--text-primary);
 }

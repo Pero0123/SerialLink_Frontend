@@ -3,24 +3,45 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
 } from 'recharts';
 import GlobalContext from '../../store/globalContext';
+import classes from '../../styles/timetrack.module.css';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
-const COLORS = ['#f5ad42', '#4af', '#f55', '#4f4', '#a4f', '#fa4', '#4ff'];
+// One fixed color per sensor variable, taken from the app's pie-chart palette
+const SENSOR_COLORS = {
+  return_z1:     '#1E3D6E', // dark navy
+  return_z2:     '#29B6F6', // sky blue
+  return_z3:     '#E91E8C', // hot pink
+  discharge_z1:  '#CC3333', // red
+  coolant_water: '#00897B', // teal
+  evap_coil:     '#7B1FA2', // purple
+  ambient:       '#F5A623', // amber
+};
+// Fallback palette for any unexpected variable names
+const FALLBACK_COLORS = ['#43A047', '#FF7043', '#26C6DA', '#FDD835', '#8D6E63'];
+function sensorColor(variable, index) {
+  return SENSOR_COLORS[variable] ?? FALLBACK_COLORS[index % FALLBACK_COLORS.length];
+}
+
+// Recharts prop objects — must stay inline (Recharts API)
+const chartGrid   = { horizontal: true, vertical: true, strokeDasharray: '3 3', stroke: '#9DA6AF' };
+const axisStyle   = { stroke: '#5A6269', tick: { fill: '#393E43', fontSize: 14 }, minTickGap: 60 };
+const tooltipStyle = { backgroundColor: '#9DA6AF', border: '1px solid #7B858E', color: '#1B1D20' };
+const legendStyle  = { color: '#1B1D20' };
 
 function TimeTrackPage() {
   const globalCtx = useContext(GlobalContext);
 
-  const [devices,          setDevices]          = useState([]);
-  const [selectedDevice,   setSelectedDevice]   = useState('');
-  const [latest,           setLatest]           = useState(null);
-  const [variables,        setVariables]        = useState([]);
-  const [selectedVars,     setSelectedVars]     = useState([]);
-  const [fromDate,         setFromDate]         = useState('');
-  const [toDate,           setToDate]           = useState('');
-  const [chartData,        setChartData]        = useState([]);
-  const [error,            setError]            = useState('');
-  const [loading,          setLoading]          = useState(false);
+  const [devices,        setDevices]        = useState([]);
+  const [selectedDevice, setSelectedDevice] = useState('');
+  const [latest,         setLatest]         = useState(null);
+  const [variables,      setVariables]      = useState([]);
+  const [selectedVars,   setSelectedVars]   = useState([]);
+  const [fromDate,       setFromDate]       = useState('');
+  const [toDate,         setToDate]         = useState('');
+  const [chartData,      setChartData]      = useState([]);
+  const [error,          setError]          = useState('');
+  const [loading,        setLoading]        = useState(false);
 
   useEffect(() => {
     if (!globalCtx.token) return;
@@ -70,7 +91,7 @@ function TimeTrackPage() {
       if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
       const vars = await res.json();
       setVariables(vars);
-      setSelectedVars(vars); // default: all selected
+      setSelectedVars(vars);
     } catch (e) {
       setError(`Variables: ${e.message}`);
     }
@@ -82,14 +103,13 @@ function TimeTrackPage() {
     setError('');
     try {
       let url = `${API_URL}/readings?device=${selectedDevice}&limit=5000`;
-      if (fromDate) url += `&from=${new Date(fromDate).toISOString()}`;
-      if (toDate)   url += `&to=${new Date(toDate).toISOString()}`;
+      if (fromDate) url += `&from=${new Date(fromDate + 'T00:00:00').toISOString()}`;
+      if (toDate)   url += `&to=${new Date(toDate   + 'T23:59:59').toISOString()}`;
 
       const res = await fetch(url, { headers: globalCtx.getAuthHeaders() });
       if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
-      const raw = await res.json(); // [{variable, value, timestamp}], oldest→newest
+      const raw = await res.json();
 
-      // Pivot: group by timestamp, one row per timestamp with a key per variable
       const byTime = {};
       for (const r of raw) {
         if (!selectedVars.includes(r.variable)) continue;
@@ -115,43 +135,49 @@ function TimeTrackPage() {
 
   function formatTick(ts) {
     const d = new Date(ts);
-    return `${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`;
+    return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
   }
 
   return (
-    <div style={{ padding: '2rem', fontFamily: 'monospace' }}>
+    <div className={classes.container}>
       <h1>Readings</h1>
 
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {error && <p className={classes.error}>{error}</p>}
 
       {/* Device selector */}
-      <div style={{ marginBottom: '1.5rem' }}>
-        <label style={{ marginRight: '0.5rem' }}>Device:</label>
-        <select value={selectedDevice} onChange={e => setSelectedDevice(e.target.value)}>
-          {devices.length === 0 && <option value="">No devices registered</option>}
-          {devices.map(d => (
-            <option key={d.label} value={d.label}>{d.name} ({d.label})</option>
-          ))}
-        </select>
+      <div className={classes.deviceSelector}>
+        <label>
+          Device:
+          <select
+            className={classes.deviceSelect}
+            value={selectedDevice}
+            onChange={e => setSelectedDevice(e.target.value)}
+          >
+            {devices.length === 0 && <option value="">No devices registered</option>}
+            {devices.map(d => (
+              <option key={d.label} value={d.label}>{d.name} ({d.label})</option>
+            ))}
+          </select>
+        </label>
       </div>
 
       {/* Latest readings */}
       <h2>Latest</h2>
       {latest && Object.keys(latest).length > 0 ? (
-        <table style={{ borderCollapse: 'collapse', marginBottom: '2rem' }}>
+        <table className={classes.table}>
           <thead>
             <tr>
-              <th style={th}>Variable</th>
-              <th style={th}>Value</th>
-              <th style={th}>Timestamp</th>
+              <th className={classes.th}>Variable</th>
+              <th className={classes.th}>Value</th>
+              <th className={classes.th}>Timestamp</th>
             </tr>
           </thead>
           <tbody>
             {Object.entries(latest).map(([variable, { value, timestamp }]) => (
               <tr key={variable}>
-                <td style={td}>{variable}</td>
-                <td style={td}>{value}</td>
-                <td style={td}>{new Date(timestamp).toLocaleString()}</td>
+                <td className={classes.td}>{variable}</td>
+                <td className={classes.td}>{value}</td>
+                <td className={classes.td}>{new Date(timestamp).toLocaleString()}</td>
               </tr>
             ))}
           </tbody>
@@ -160,48 +186,49 @@ function TimeTrackPage() {
         <p>No data</p>
       )}
 
-      {/* Chart section */}
+      {/* Chart */}
       <h2>Chart</h2>
 
-      {/* Sensor checkboxes */}
+      {/* Variable checkboxes */}
       {variables.length > 0 && (
-        <div style={{ marginBottom: '1rem', display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+        <div className={classes.varList}>
           {variables.map((v, i) => (
-            <label key={v} style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', cursor: 'pointer' }}>
+            <label key={v} className={classes.varLabel}>
               <input
                 type="checkbox"
                 checked={selectedVars.includes(v)}
                 onChange={() => toggleVar(v)}
               />
-              <span style={{ color: COLORS[i % COLORS.length] }}>{v}</span>
+              {/* color is dynamic per variable — must stay inline */}
+              <span style={{ color: sensorColor(v, i) }}>{v}</span>
             </label>
           ))}
         </div>
       )}
 
       {/* Date range */}
-      <div style={{ marginBottom: '1rem', display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center' }}>
-        <label style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem', fontSize: '0.85rem' }}>
+      <div className={classes.dateRange}>
+        <label className={classes.dateField}>
           From
           <input
-            type="datetime-local"
+            type="date"
             value={fromDate}
             onChange={e => setFromDate(e.target.value)}
-            style={inputStyle}
+            className={classes.input}
           />
         </label>
-        <label style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem', fontSize: '0.85rem' }}>
+        <label className={classes.dateField}>
           To
           <input
-            type="datetime-local"
+            type="date"
             value={toDate}
             onChange={e => setToDate(e.target.value)}
-            style={inputStyle}
+            className={classes.input}
           />
         </label>
         <button
           onClick={fetchChartData}
-          style={{ ...btnStyle, alignSelf: 'flex-end' }}
+          className={classes.fetchBtn}
           disabled={loading || !selectedDevice}
         >
           {loading ? 'Loading…' : 'Fetch'}
@@ -209,39 +236,39 @@ function TimeTrackPage() {
         {(fromDate || toDate) && (
           <button
             onClick={() => { setFromDate(''); setToDate(''); }}
-            style={{ ...btnStyle, backgroundColor: '#555', alignSelf: 'flex-end' }}
+            className={classes.clearBtn}
           >
             Clear dates
           </button>
         )}
       </div>
 
+      {/* Chart output */}
       {chartData.length > 0 ? (
-        <div style={{ width: '100%' }}>
+        <div className={classes.chartWrapper}>
         <ResponsiveContainer width="100%" height={380}>
           <LineChart data={chartData} margin={{ top: 5, right: 30, left: 10, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#333" />
+            <CartesianGrid {...chartGrid} />
             <XAxis
               dataKey="timestamp"
               type="number"
               scale="time"
               domain={['dataMin', 'dataMax']}
               tickFormatter={formatTick}
-              stroke="#aaa"
-              tick={{ fill: '#aaa', fontSize: 11 }}
+              {...axisStyle}
             />
-            <YAxis width={45} stroke="#aaa" tick={{ fill: '#aaa', fontSize: 11 }} />
+            <YAxis width={45} {...axisStyle} />
             <Tooltip
               labelFormatter={ts => new Date(ts).toLocaleString()}
-              contentStyle={{ backgroundColor: '#1a1a1a', border: '1px solid #555', color: '#fff' }}
+              contentStyle={tooltipStyle}
             />
-            <Legend wrapperStyle={{ color: '#ccc' }} />
+            <Legend wrapperStyle={legendStyle} />
             {selectedVars.map((v, i) => (
               <Line
                 key={v}
                 type="monotone"
                 dataKey={v}
-                stroke={COLORS[i % COLORS.length]}
+                stroke={sensorColor(v, i)}
                 dot={false}
                 connectNulls={false}
               />
@@ -250,40 +277,10 @@ function TimeTrackPage() {
         </ResponsiveContainer>
         </div>
       ) : (
-        !loading && <p style={{ color: '#888' }}>Select sensors and a date range, then click Fetch.</p>
+        !loading && <p className={classes.chartHint}>Select sensors and a date range, then click Fetch.</p>
       )}
     </div>
   );
 }
-
-const th = {
-  border: '1px solid #555',
-  padding: '0.4rem 0.8rem',
-  textAlign: 'left',
-  backgroundColor: '#222',
-  color: '#fff',
-};
-
-const td = {
-  border: '1px solid #555',
-  padding: '0.4rem 0.8rem',
-};
-
-const inputStyle = {
-  padding: '0.4rem',
-  border: '1px solid #555',
-  borderRadius: '4px',
-  backgroundColor: '#111',
-  color: '#fff',
-};
-
-const btnStyle = {
-  padding: '0.5rem 1rem',
-  backgroundColor: 'rgb(245, 173, 66)',
-  color: '#fff',
-  border: 'none',
-  borderRadius: '4px',
-  cursor: 'pointer',
-};
 
 export default TimeTrackPage;

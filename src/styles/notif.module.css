@@ -5,22 +5,32 @@
 }
 
 .readBtn {
-  background-color: #4caf50;
-  color: white;
+  background-color: var(--btn-primary);
+  color: var(--text-on-dark);
   padding: 0.5rem 1rem;
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.readBtn:hover {
+  background-color: var(--btn-primary-hover);
 }
 
 .deleteBtn {
-  background-color: #f44336;
-  color: white;
+  background-color: var(--btn-danger);
+  color: var(--text-on-dark);
   padding: 0.5rem 1rem;
   border: none;
   border-radius: 4px;
   cursor: pointer;
   font-size: 0.8rem;
+  transition: background-color 0.2s;
+}
+
+.deleteBtn:hover {
+  background-color: var(--btn-danger-hover);
 }
 
 .ntfs {
@@ -31,7 +41,7 @@
 }
 
 .activeEntry {
-  background-color: #e8f5e8;
+  background-color: var(--bg-active);
   padding: 1rem;
   border-radius: 4px;
   margin-bottom: 0.5rem;
@@ -45,17 +55,18 @@
   justify-content: space-between;
   align-items: center;
   padding: 1rem;
-  border: 1px solid #eee;
+  border: 1px solid var(--border-light);
   border-radius: 4px;
+  background: var(--bg-surface);
 }
 
 .ntf p {
   margin: 0.25rem 0 0 0;
-  color: #666;
+  color: var(--text-muted);
   font-size: 0.9rem;
 }
 
 .duration {
   font-weight: bold;
-  color: #333;
+  color: var(--text-primary);
 }

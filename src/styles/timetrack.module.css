@@ -1,145 +1,129 @@
 .container {
-  max-width: 800px;
+  max-width: 1000px;
   margin: 0 auto;
   padding: 2rem;
+  font-family: monospace;
 }
 
-.inpt {
-  display: flex;
-  gap: 1rem;
+.error {
+  color: var(--btn-danger);
+}
+
+/* ── Device selector ───────────────────────────────── */
+.deviceSelector {
+  margin-bottom: 1.5rem;
+}
+
+.deviceSelect {
+  margin-left: 0.5rem;
+  padding: 0.3rem 0.5rem;
+  border: 1px solid var(--border-light);
+  border-radius: 4px;
+  background: var(--input-bg);
+  color: var(--input-color);
+}
+
+/* ── Latest readings table ─────────────────────────── */
+.table {
+  border-collapse: collapse;
+  margin-bottom: 2rem;
+}
+
+.th {
+  border: 1px solid var(--neutral-500);
+  padding: 0.4rem 0.8rem;
+  text-align: left;
+  background-color: #092266;
+  color: var(--neutral-100);
+}
+
+.td {
+  border: 1px solid var(--border-light);
+  padding: 0.4rem 0.8rem;
+}
+
+/* ── Variable checkboxes ───────────────────────────── */
+.varList {
   margin-bottom: 1rem;
+  display: flex;
   flex-wrap: wrap;
-}
-
-.inpt input,
-.inpt select {
-  padding: 0.5rem;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 4px;
-  flex: 1;
-  min-width: 200px;
-  background: rgba(255, 255, 255, 0.1) !important;
-}
-
-.startBtn {
-  background-color: #4caf50;
-  color: white;
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.stopBtn {
-  background-color: #f44336;
-  color: white;
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.createBtn {
-  background-color: #2196f3;
-  color: white;
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.updateBtn {
-  background-color: #ff9800;
-  color: white;
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.deleteBtn {
-  background-color: #f44336;
-  color: white;
-  padding: 0.25rem 0.5rem;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.8rem;
-}
-
-.projects {
-  display: flex;
-  flex-direction: column;
   gap: 0.5rem;
+}
+
+.varLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  cursor: pointer;
+}
+
+/* ── Date range ────────────────────────────────────── */
+.dateRange {
   margin-bottom: 1rem;
-}
-
-.project {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem;
-  border: 1px solid #eee;
-  border-radius: 4px;
-}
-
-.project p {
-  margin: 0.25rem 0 0 0;
-  color: #666;
-  font-size: 0.9rem;
-}
-
-.actions {
-  display: flex;
-  align-items: center;
   gap: 1rem;
+  flex-wrap: wrap;
+  align-items: flex-end;
 }
 
-.viewSelect {
-  width: 100%;
-  padding: 0.5rem;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 4px;
-  margin-bottom: 1rem;
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.activeEntries {
-  margin-top: 1rem;
-}
-
-.activeEntry {
-  background-color: #e8f5e8;
-  padding: 1rem;
-  border-radius: 4px;
-  margin-bottom: 0.5rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.entries {
+.dateField {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.2rem;
+  font-size: 0.85rem;
 }
 
-.entry {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem;
-  border: 1px solid #eee;
+.input {
+  padding: 0.4rem;
+  border: 1px solid var(--neutral-500);
   border-radius: 4px;
+  background-color: #092266;
+  color: var(--neutral-100);
+  color-scheme: dark;
 }
 
-.entry p {
-  margin: 0.25rem 0 0 0;
-  color: #666;
-  font-size: 0.9rem;
+/* ── Buttons ───────────────────────────────────────── */
+.fetchBtn {
+  padding: 0.5rem 1rem;
+  background-color: var(--btn-primary);
+  color: var(--text-on-dark);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
 }
 
-.duration {
-  font-weight: bold;
-  color: #333;
+.fetchBtn:hover:not(:disabled) {
+  background-color: var(--btn-primary-hover);
+}
+
+.fetchBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.clearBtn {
+  padding: 0.5rem 1rem;
+  background-color: var(--btn-neutral);
+  color: var(--text-on-dark);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.clearBtn:hover {
+  background-color: var(--btn-neutral-hover);
+}
+
+/* ── Chart wrapper ─────────────────────────────────── */
+.chartWrapper {
+  background-color: #C6CBD1;
+  border-radius: 8px;
+  padding: 1rem 0.5rem 0.5rem;
+}
+
+/* ── Chart hint ────────────────────────────────────── */
+.chartHint {
+  color: var(--text-muted);
 }

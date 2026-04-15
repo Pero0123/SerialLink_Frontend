@@ -1,6 +1,7 @@
 import { useState, useContext, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import GlobalContext from '../../store/globalContext';
+import classes from '../../styles/auth.module.css';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -9,7 +10,7 @@ function RegisterPage() {
   const [password,           setPassword]           = useState('');
   const [registrationSecret, setRegistrationSecret] = useState('');
   const [error,              setError]              = useState('');
-  const router = useRouter();
+  const router    = useRouter();
   const globalCtx = useContext(GlobalContext);
 
   useEffect(() => {
@@ -21,17 +22,14 @@ function RegisterPage() {
   const handleRegister = async (e) => {
     e.preventDefault();
     setError('');
-
     try {
       const response = await fetch(`${API_URL}/auth/register`, {
-        method: 'POST',
+        method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, registrationSecret })
+        body:    JSON.stringify({ email, password, registrationSecret }),
       });
       const data = await response.json();
-
       if (response.ok) {
-        // Backend returns a token on register — log the user in immediately
         globalCtx.login(data.token, email);
         router.push('/');
       } else {
@@ -43,51 +41,43 @@ function RegisterPage() {
   };
 
   return (
-    <div style={{ maxWidth: '400px', margin: '2rem auto', padding: '2rem' }}>
+    <div className={classes.container}>
       <h1>Register</h1>
-      {error && <p style={{ color: 'red', marginBottom: '1rem' }}>{error}</p>}
+      {error && <p className={classes.errorMsg}>{error}</p>}
       <form onSubmit={handleRegister}>
-        <div style={{ marginBottom: '1rem' }}>
+        <div className={classes.field}>
           <input
             type="email"
             placeholder="Email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={e => setEmail(e.target.value)}
             required
-            style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
+            className={classes.input}
           />
         </div>
-        <div style={{ marginBottom: '1rem' }}>
+        <div className={classes.field}>
           <input
             type="password"
             placeholder="Password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={e => setPassword(e.target.value)}
             required
-            style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
+            className={classes.input}
           />
         </div>
-        <div style={{ marginBottom: '1rem' }}>
+        <div className={classes.field}>
           <input
             type="password"
             placeholder="Registration secret"
             value={registrationSecret}
-            onChange={(e) => setRegistrationSecret(e.target.value)}
+            onChange={e => setRegistrationSecret(e.target.value)}
             required
-            style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
+            className={classes.input}
           />
         </div>
-        <button
-          type="submit"
-          style={{ width: '100%', padding: '0.75rem', backgroundColor: 'rgb(245, 173, 66)', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
-        >
-          Register
-        </button>
+        <button type="submit" className={classes.submitBtn}>Register</button>
       </form>
-      <button
-        onClick={() => router.push('/auth/login')}
-        style={{ width: '100%', padding: '0.75rem', backgroundColor: 'transparent', color: 'white', border: '1px solid rgba(255, 255, 255, 0.3)', borderRadius: '4px', cursor: 'pointer', marginTop: '1rem' }}
-      >
+      <button onClick={() => router.push('/auth/login')} className={classes.secondaryBtn}>
         Back to Login
       </button>
     </div>
