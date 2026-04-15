@@ -150,6 +150,7 @@ function DevicesPage() {
       {devices.length === 0 ? (
         <p>No devices registered yet.</p>
       ) : (
+        <div className={classes.tableWrapper}>
         <table className={classes.table}>
           <thead>
             <tr>
@@ -198,6 +199,7 @@ function DevicesPage() {
             ))}
           </tbody>
         </table>
+        </div>
       )}
     </div>
   );

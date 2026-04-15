@@ -22,6 +22,13 @@
   color: var(--input-color);
 }
 
+@media (max-width: 480px) {
+  .container {
+    padding: 1rem;
+    margin: 1rem auto;
+  }
+}
+
 .input:-webkit-autofill,
 .input:-webkit-autofill:hover,
 .input:-webkit-autofill:focus {

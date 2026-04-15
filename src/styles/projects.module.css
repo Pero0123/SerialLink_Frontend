@@ -35,7 +35,15 @@
   border-radius: 4px;
   background-color: var(--input-bg);
   color: var(--input-color);
-  width: 260px;
+  width: 100%;
+  max-width: 260px;
+}
+
+/* ── Table wrapper (enables horizontal scroll on mobile) ── */
+.tableWrapper {
+  overflow-x: auto;
+  width: 100%;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* ── Buttons ───────────────────────────────────────── */
@@ -113,6 +121,17 @@
 .btnRow {
   display: flex;
   gap: 0.4rem;
+}
+
+/* ── Mobile ────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .registerForm {
+    max-width: 100%;
+  }
 }
 
 /* ── Feedback messages ─────────────────────────────── */

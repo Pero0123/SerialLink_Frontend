@@ -116,11 +116,29 @@
   background-color: var(--btn-neutral-hover);
 }
 
+/* ── Table wrapper (enables horizontal scroll on mobile) ── */
+.tableWrapper {
+  overflow-x: auto;
+  width: 100%;
+  -webkit-overflow-scrolling: touch;
+}
+
 /* ── Chart wrapper ─────────────────────────────────── */
 .chartWrapper {
   background-color: #C6CBD1;
   border-radius: 8px;
   padding: 1rem 0.5rem 0.5rem;
+}
+
+/* ── Mobile ────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .chartWrapper {
+    padding: 0.5rem 0.25rem;
+  }
 }
 
 /* ── Chart hint ────────────────────────────────────── */

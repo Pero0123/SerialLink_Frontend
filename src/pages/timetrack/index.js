@@ -164,6 +164,7 @@ function TimeTrackPage() {
       {/* Latest readings */}
       <h2>Latest</h2>
       {latest && Object.keys(latest).length > 0 ? (
+        <div className={classes.tableWrapper}>
         <table className={classes.table}>
           <thead>
             <tr>
@@ -182,6 +183,7 @@ function TimeTrackPage() {
             ))}
           </tbody>
         </table>
+        </div>
       ) : (
         <p>No data</p>
       )}

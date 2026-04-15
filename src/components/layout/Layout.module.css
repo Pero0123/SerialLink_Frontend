@@ -3,3 +3,11 @@
   width: 90%;
   max-width: 40rem;
 }
+
+@media (max-width: 768px) {
+  .main {
+    margin: 1rem auto;
+    width: 100%;
+    max-width: 100%;
+  }
+}
