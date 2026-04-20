@@ -66,6 +66,30 @@ function LoginPage() {
         </div>
         <button type="submit" className={classes.submitBtn}>Login</button>
       </form>
+      <button
+        className={classes.secondaryBtn}
+        onClick={() => {
+          setEmail('testuser@gmail.com');
+          setPassword('Password');
+          fetch(`${API_URL}/auth/login`, {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ email: 'testuser@gmail.com', password: 'Password' }),
+          })
+            .then(r => r.json().then(data => ({ ok: r.ok, data })))
+            .then(({ ok, data }) => {
+              if (ok) {
+                globalCtx.login(data.token, 'testuser@gmail.com');
+                router.push('/');
+              } else {
+                setError(data.message || 'Login failed');
+              }
+            })
+            .catch(() => setError('Network error. Check that the backend is running.'));
+        }}
+      >
+        Login as Test User
+      </button>
       <button onClick={() => router.push('/auth/register')} className={classes.secondaryBtn}>
         Register
       </button>
